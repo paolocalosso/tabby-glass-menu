@@ -36,6 +36,8 @@ It's plain JavaScript, there is nothing to build.
 - background opacity (default 0.55)
 - blur of the window content behind the menu (default 12 px)
 - corner radius (default 20 px)
+- border: width (default 1 px, 0 for none), style (solid, dashed, dotted,
+  double), color and opacity (default white at 0.06)
 - show a sample menu to try the settings
 
 The background takes the color of the Tabby theme.

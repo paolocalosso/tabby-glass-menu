@@ -44,7 +44,14 @@ const DEFAULTS = {
     blur: 12,
     // corner radius, px
     radius: 20,
+    // border: width in px (0 for none), CSS style, color and its opacity
+    borderWidth: 1,
+    borderStyle: 'solid',
+    borderColor: '#ffffff',
+    borderOpacity: 0.06,
 }
+
+const BORDER_STYLES = ['solid', 'dashed', 'dotted', 'double']
 
 const FALLBACK_BG = '#1d201e'
 const FALLBACK_FG = '#e3e2be'
@@ -74,7 +81,7 @@ const CSS = `
     font-family: system-ui, sans-serif;
     font-size: 13px;
     line-height: 1.35;
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    border: var(--tgm-border-width) var(--tgm-border-style) var(--tgm-border-color);
     box-shadow: 0 2px 3px -1px rgba(0, 0, 0, 0.15), 0 4px 3px 0 rgba(0, 0, 0, 0.18),
         0 1px 6px 0 rgba(0, 0, 0, 0.12);
     user-select: none;
@@ -289,6 +296,14 @@ class GlassMenu {
         el.style.setProperty('--tgm-fg', fg)
         el.style.setProperty('--tgm-blur', `${clamp(num(s.blur, DEFAULTS.blur), 0, 100)}px`)
         el.style.setProperty('--tgm-radius', `${clamp(num(s.radius, DEFAULTS.radius), 0, 40)}px`)
+        const borderColor = /^#[0-9a-f]{3}([0-9a-f]{3})?$/i.test(s.borderColor)
+            ? s.borderColor : DEFAULTS.borderColor
+        const borderPct = Math.round(clamp(num(s.borderOpacity, DEFAULTS.borderOpacity), 0, 1) * 100)
+        el.style.setProperty('--tgm-border-width', `${clamp(num(s.borderWidth, DEFAULTS.borderWidth), 0, 8)}px`)
+        el.style.setProperty('--tgm-border-style',
+            BORDER_STYLES.includes(s.borderStyle) ? s.borderStyle : DEFAULTS.borderStyle)
+        el.style.setProperty('--tgm-border-color',
+            `color-mix(in srgb, ${borderColor} ${borderPct}%, transparent)`)
     }
 
     viewport () {
@@ -642,11 +657,58 @@ const SETTINGS_TEMPLATE = `
     </div>
 </div>
 
+<h4 class="tgm-section">Border</h4>
+
+<div class="form-line">
+    <div class="header">
+        <div class="title">Width</div>
+        <div class="description">In pixels, 0 for no border</div>
+    </div>
+    <div class="tgm-range">
+        <input type="range" class="form-range" min="0" max="8" step="1"
+            [(ngModel)]="config.store.glassMenu.borderWidth" (ngModelChange)="save()">
+        <span>{{ config.store.glassMenu.borderWidth }} px</span>
+    </div>
+</div>
+
+<div class="form-line">
+    <div class="header">
+        <div class="title">Style</div>
+    </div>
+    <select class="form-control tgm-select"
+        [(ngModel)]="config.store.glassMenu.borderStyle" (ngModelChange)="save()">
+        <option *ngFor="let style of borderStyles" [ngValue]="style">{{ style }}</option>
+    </select>
+</div>
+
+<div class="form-line">
+    <div class="header">
+        <div class="title">Color</div>
+    </div>
+    <input type="color" class="tgm-color"
+        [(ngModel)]="config.store.glassMenu.borderColor" (ngModelChange)="save()">
+</div>
+
+<div class="form-line">
+    <div class="header">
+        <div class="title">Opacity</div>
+        <div class="description">0 is invisible, 1 is the full color</div>
+    </div>
+    <div class="tgm-range">
+        <input type="range" class="form-range" min="0" max="1" step="0.01"
+            [(ngModel)]="config.store.glassMenu.borderOpacity" (ngModelChange)="save()">
+        <span>{{ config.store.glassMenu.borderOpacity | number:'1.2-2' }}</span>
+    </div>
+</div>
+
 <button class="btn btn-secondary" (click)="preview($event)">Show a sample menu</button>
 `
 
 const SETTINGS_STYLES = [`
 .tgm-intro { opacity: 0.8; }
+.tgm-section { margin-top: 1.5rem; }
+.tgm-select { width: auto; min-width: 140px; }
+.tgm-color { width: 48px; height: 32px; padding: 0; border: none; background: none; cursor: pointer; }
 .tgm-range { display: flex; align-items: center; gap: 12px; min-width: 260px; }
 .tgm-range input { flex: 1; }
 .tgm-range span { min-width: 3.5em; text-align: right; font-variant-numeric: tabular-nums; }
@@ -656,6 +718,7 @@ class GlassMenuSettingsComponent {
     constructor (config, menu) {
         this.config = config
         this.menu = menu
+        this.borderStyles = BORDER_STYLES
     }
 
     save () {
@@ -663,6 +726,8 @@ class GlassMenuSettingsComponent {
         s.opacity = num(s.opacity, DEFAULTS.opacity)
         s.blur = num(s.blur, DEFAULTS.blur)
         s.radius = num(s.radius, DEFAULTS.radius)
+        s.borderWidth = num(s.borderWidth, DEFAULTS.borderWidth)
+        s.borderOpacity = num(s.borderOpacity, DEFAULTS.borderOpacity)
         this.config.save()
     }
 
