@@ -1,0 +1,33 @@
+{
+  "name": "tabby-glass-menu",
+  "version": "0.1.0",
+  "description": "Translucent, blurred context menus for Tabby instead of Electron's opaque native ones",
+  "keywords": [
+    "tabby-plugin",
+    "context-menu",
+    "blur",
+    "transparency",
+    "glass"
+  ],
+  "main": "index.js",
+  "files": [
+    "index.js",
+    "README.md",
+    "LICENSE"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/paolocalosso/tabby-glass-menu.git"
+  },
+  "homepage": "https://github.com/paolocalosso/tabby-glass-menu#readme",
+  "bugs": {
+    "url": "https://github.com/paolocalosso/tabby-glass-menu/issues"
+  },
+  "author": "Paolo Calosso <paolo@oprtorino.net>",
+  "license": "MIT",
+  "peerDependencies": {
+    "@angular/core": "*",
+    "tabby-core": "*",
+    "tabby-settings": "*"
+  }
+}
