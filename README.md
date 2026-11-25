@@ -13,8 +13,8 @@ the menu too.
 Every context menu opened by Tabby or by other plugins goes through the same
 place, so all of them are replaced, with the same items and actions:
 checkboxes, radio items, disabled items and submenus. Separators are left
-out, and the menu uses the Excalifont font (falling back to the system UI
-font).
+out, and the menu uses the system UI font, so it follows it when you change
+it.
 
 ## Install
 

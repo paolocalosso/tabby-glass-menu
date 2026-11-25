@@ -12,7 +12,7 @@
  * Every menu built by Tabby or by other plugins goes through the same method,
  * so all of them are covered. Same items, same actions: labels,
  * checkboxes, radio items, disabled items, submenus, keyboard navigation.
- * Separators are left out, and the menu uses the Excalifont font.
+ * Separators are left out, and the menu uses the system UI font.
  * The menu is part of the window, so it can't extend past its edges: near an
  * edge it opens towards the inside.
  *
@@ -69,8 +69,9 @@ const CSS = `
     -webkit-backdrop-filter: blur(var(--tgm-blur));
     backdrop-filter: blur(var(--tgm-blur));
     color: var(--tgm-fg);
-    /* the system UI font, like the GTK menus */
-    font-family: 'Excalifont', system-ui, sans-serif;
+    /* the system UI font (Chromium reads it from the GTK settings on Linux),
+       so the menu follows it when it changes */
+    font-family: system-ui, sans-serif;
     font-size: 13px;
     line-height: 1.35;
     border: 1px solid rgba(255, 255, 255, 0.06);
