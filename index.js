@@ -21,12 +21,13 @@
  */
 'use strict'
 
-const { NgModule, Injectable, Component } = require('@angular/core')
+const { NgModule, Injectable, Injector, Component } = require('@angular/core')
 const { CommonModule } = require('@angular/common')
 const { FormsModule } = require('@angular/forms')
 const TabbyCore = require('tabby-core')
-const { ConfigProvider, ConfigService, PlatformService } = TabbyCore
-const { SettingsTabProvider } = require('tabby-settings')
+const { ConfigProvider, ConfigService, PlatformService, AppService } = TabbyCore
+const TabbySettings = require('tabby-settings')
+const { SettingsTabProvider } = TabbySettings
 
 const LOG = '[tabby-glass-menu]'
 const STYLE_ID = 'tabby-glass-menu-style'
@@ -49,6 +50,8 @@ const DEFAULTS = {
     borderStyle: 'solid',
     borderColor: '#ffffff',
     borderOpacity: 0.06,
+    // a "Settings" item at the end of every menu, to open Tabby's settings
+    settingsItem: true,
 }
 
 const BORDER_STYLES = ['solid', 'dashed', 'dotted', 'double']
@@ -520,9 +523,10 @@ function ensureStyle (doc) {
 /* ---------------------------------------------------------------- Service */
 
 class GlassMenuService {
-    constructor (config, platform) {
+    constructor (config, platform, injector) {
         this.config = config
         this.platform = platform
+        this.injector = injector
         this.current = null
         this.lastPointer = { x: 0, y: 0 }
         this.original = null
@@ -565,8 +569,24 @@ class GlassMenuService {
             if (this.current === m) this.current = null
         })
         this.current = glass
-        glass.open(menu || [], x, y)
+        glass.open(this.withSettingsItem(menu || []), x, y)
         return glass
+    }
+
+    /** The menu with a "Settings" item at the end, if enabled and possible. */
+    withSettingsItem (menu) {
+        if (!this.settings.settingsItem || !TabbySettings.SettingsTabComponent) return menu
+        return [...menu, { label: 'Settings', click: () => this.openSettings() }]
+    }
+
+    /** Like Tabby's settings button: select the settings tab, or open one. */
+    openSettings () {
+        const { SettingsTabComponent } = TabbySettings
+        // AppService is fetched on demand: it isn't needed until then
+        const app = this.injector.get(AppService)
+        const tab = app.tabs.find(t => t instanceof SettingsTabComponent)
+        if (tab) app.selectTab(tab)
+        else app.openNewTabRaw({ type: SettingsTabComponent })
     }
 
     /** Sample menu for the settings page. */
@@ -592,7 +612,11 @@ class GlassMenuService {
         ], event)
     }
 }
-GlassMenuService.ctorParameters = () => [{ type: ConfigService }, { type: PlatformService }]
+GlassMenuService.ctorParameters = () => [
+    { type: ConfigService },
+    { type: PlatformService },
+    { type: Injector },
+]
 Injectable({ providedIn: 'root' })(GlassMenuService)
 
 class GlassMenuConfigProvider extends ConfigProvider {
@@ -621,6 +645,14 @@ const SETTINGS_TEMPLATE = `
         <div class="description">When off, Tabby shows its usual native menus</div>
     </div>
     <toggle [(ngModel)]="config.store.glassMenu.enabled" (ngModelChange)="save()"></toggle>
+</div>
+
+<div class="form-line">
+    <div class="header">
+        <div class="title">Settings item</div>
+        <div class="description">Adds "Settings" at the end of every menu, to open Tabby's settings</div>
+    </div>
+    <toggle [(ngModel)]="config.store.glassMenu.settingsItem" (ngModelChange)="save()"></toggle>
 </div>
 
 <div class="form-line">

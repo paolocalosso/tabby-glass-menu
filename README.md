@@ -33,6 +33,8 @@ It's plain JavaScript, there is nothing to build.
 **Settings → Glass menu**:
 
 - turn the glass menus on or off (off brings back the native menus)
+- add a **Settings** item at the end of every menu, to open Tabby's settings
+  (on by default)
 - background opacity (default 0.55)
 - blur of the window content behind the menu (default 12 px)
 - corner radius (default 20 px)
