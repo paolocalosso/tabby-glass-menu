@@ -65,7 +65,7 @@ const CSS = `
     position: fixed;
     z-index: 2147483000;
     box-sizing: border-box;
-    min-width: 180px;
+    min-width: 200px;
     max-width: 440px;
     max-height: calc(100vh - ${2 * EDGE_MARGIN}px);
     overflow-x: hidden;
@@ -99,7 +99,7 @@ const CSS = `
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 5px 10px;
+    padding: 5px 14px;
     border-radius: calc(var(--tgm-radius) * 0.6);
     white-space: nowrap;
     cursor: default;
@@ -208,7 +208,9 @@ class GlassMenu {
         this.applySettings(el)
 
         const panel = { el, rows: [], active: -1, parentRow }
-        if (items.some(i => ['checkbox', 'radio'].includes(itemType(i)))) {
+        // the check column only when something is checked: an empty one would
+        // push every label to the right
+        if (items.some(i => ['checkbox', 'radio'].includes(itemType(i)) && i.checked)) {
             el.classList.add('tgm-has-checks')
         }
 

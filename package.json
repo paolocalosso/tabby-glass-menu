@@ -1,6 +1,6 @@
 {
   "name": "tabby-glass-menu",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Translucent, blurred context menus for Tabby instead of Electron's opaque native ones",
   "keywords": [
     "tabby-plugin",
